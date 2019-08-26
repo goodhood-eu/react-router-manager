@@ -13,13 +13,17 @@ export const connectResolver = (getPromise, Component) => {
   return Component;
 };
 
+const getMatchableRoute = (route) => (
+  typeof route.exact === 'undefined' ? { ...route, exact: true } : route
+);
+
 const matchRoute = (routes, path) => {
   let matches = [];
 
   for (const route of routes) {
     // It may be convenient to have `condition && route` in configuration objects, this allows it
     if (!route) continue;
-    const match = matchPath(path, route);
+    const match = matchPath(path, getMatchableRoute(route));
     if (!match) continue;
 
     matches.push({ route, match });
@@ -111,7 +115,7 @@ const renderItem = (route, i) => {
   const { ...options } = route;
   if (!options.key) options.key = i;
   const render = options.from ? renderRedirect : renderRoute;
-  return render(options);
+  return render(getMatchableRoute(options));
 };
 
 export const renderRoutes = (routes) => {

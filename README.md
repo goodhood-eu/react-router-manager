@@ -56,6 +56,7 @@ A route config is an array of objects like this:
     ],
 
     // Any other props you would pass to a Route
+    // We set this to `true` by default unlike the React Router. Pass `false` to override.
     exact: true,
     // ...
   },
