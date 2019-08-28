@@ -1,20 +1,22 @@
 react-router-manager
 ====================
 
-React Router server side rendering with data fetching. This module is heavily based on [react-router-config](https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config) and expands on the same concept. The goal is to create a one stop solution to fetching data and routing on both client and server side when working with React Components. It is particularly useful for people migrating from [redial](https://github.com/markdalgleish/redial).
+React Router server side rendering with data fetching. This module is heavily based on [react-router-config](https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config) and expands on the same concepts. The goal is to create a one stop solution for routing and data fetching on both client and server. It is particularly useful for people migrating from [redial](https://github.com/markdalgleish/redial).
 
-### Installation
+## Installation
 
 ```
 npm install --save react-router-manager
 ```
 
-### Usage
+## Usage
 
-There are 2 distinct stages to working with this library, the first is data loading and the second is routing. In order for both to work you need to create "route configs". These configs allow for both routing and data fetching to work. Please use them for every route that needs to fetch data.
+There are 2 distinct stages to working with this library, the first is data fetching and the second is routing. In order for both to work you need to create "route configs". These configs allow for both routing and data fetching to work. Please use them for every route that needs to fetch data.
+
+**IMPORTANT**: the utilities here default to `exact: true` for route matching, which is the opposite of what Route components in React Router do. Partial matching is prone to errors and creates more issues than it solves. Override it on per route basis if needed.
 
 
-#### Route configs
+### Route configs
 A route config is an array of objects like this:
 
 ```js
@@ -56,8 +58,8 @@ A route config is an array of objects like this:
     ],
 
     // Any other props you would pass to a Route
-    // We set this to `true` by default unlike the React Router. Pass `false` to override.
-    exact: true,
+    // We default this to `true` unlike the React Router. Pass `false` to override.
+    exact: false,
     // ...
   },
 
@@ -81,9 +83,9 @@ A route config is an array of objects like this:
   //...
 ]
 ```
-Every route must have either `component`, `render` or `onEnter`. For data fetching to work `component` is required. Everything else is optional.
+Every route must have either `component`, `render` or `onEnter` for rendering. For data fetching to work `component` is required. Everything else is optional.
 
-#### connectResolver
+### connectResolver
 
 To specify a data fetching function you simply wrap your component in a `connectResolver` like in a HOC.
 
@@ -107,7 +109,7 @@ MyComponent.resolver = ({ match, route }) => (
 export default MyComponent;
 ```
 
-#### runResolver
+### runResolver
 When you are ready to collect your promises and fetch the data use `runResolver`:
 
 ```js
@@ -120,11 +122,14 @@ const pathname = history.location.pathname; // for example
 const getLocals = (details) => ({ ...details, store: reduxStore })
 
 // Once this promise is resolved it will get an array of resolved getResolver promises as an argument.
-const promise = runResolver(routes, pathname, getLocals);
+const promises = runResolver(routes, pathname, getLocals);
+Promise.all(promises);
 
 ```
 
-#### renderRoutes
+We don't wrap the array in a `Promise.all` to allow you to have more control. In server environment you might want to use `Promise.allSettled` instead.
+
+### renderRoutes
 This simply renders the route configuration for you. Pass directly into React Router like this:
 
 ```js
@@ -145,7 +150,7 @@ hydrate(
 
 These are used internally, but you might want to use them too..
 
-#### injectStatusCode
+### injectStatusCode
 ```js
 import { injectStatusCode } from 'react-router-manager';
 
@@ -158,7 +163,7 @@ const MyComponent = (props) => {
 
 ```
 
-#### RouteStatus
+### RouteStatus
 ```js
 import { RouteStatus } from 'react-router-manager';
 
@@ -172,7 +177,7 @@ const MyComponent = (props) => {
 };
 ```
 
-#### renderRoute
+### renderRoute
 ```js
 import { renderRoute } from 'react-router-manager';
 const route = {
@@ -184,7 +189,7 @@ const route = {
 const renderedRoute = renderRoute(route);
 ```
 
-#### renderRedirect
+### renderRedirect
 ```js
 import { renderRedirect } from 'react-router-manager';
 
@@ -196,7 +201,7 @@ const route =   {
 const renderedRedirect = renderRedirect(route);
 ```
 
-### A complete example
+## A complete example
 
 On the client side:
 ```js
@@ -260,21 +265,12 @@ const renderContent = ({ routes, context, location }) => {
   return renderToString(content);
 };
 
-const renderPage = (res, context, data, content) => {
-
-};
-
 module.exports = (req, res) => {
   const location = createLocation(req.url);
-
-  const handleError = (error) => {
-    console.error(`Request ${req.url} failed to fetch data:`, error);
-    res.status(500).render('index');
-  };
-
   const getLocals = (details) => ({ ...details, store, location });
 
-  const matchPage = (data) => {
+  const matchPage = (result, error) => {
+    const data = error ? {} : result;
     const context = {};
     const content = renderContent({ routes, context, location: req.url });
 
@@ -283,6 +279,11 @@ module.exports = (req, res) => {
     res.status(context.statusCode || 200).render('index', { data, content });
   };
 
-  runResolver(routes, req.path, getLocals).then(matchPage).catch(handleError);
+  const handleError = (error) => {
+    console.error(`Request ${req.url} failed to fetch data:`, error);
+    matchPage(null, error);
+  };
+
+  Promise.all(runResolver(routes, req.path, getLocals)).then(matchPage).catch(handleError);
 };
 ```
