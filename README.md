@@ -122,12 +122,8 @@ const pathname = history.location.pathname; // for example
 const getLocals = (details) => ({ ...details, store: reduxStore })
 
 // Once this promise is resolved it will get an array of resolved getResolver promises as an argument.
-const promises = runResolver(routes, pathname, getLocals);
-Promise.all(promises);
-
+runResolver(routes, pathname, getLocals);
 ```
-
-We don't wrap the array in a `Promise.all` to allow you to have more control. In server environment you might want to use `Promise.allSettled` instead.
 
 ### renderRoutes
 This simply renders the route configuration for you. Pass directly into React Router like this:
@@ -284,6 +280,6 @@ module.exports = (req, res) => {
     matchPage(null, error);
   };
 
-  Promise.all(runResolver(routes, req.path, getLocals)).then(matchPage).catch(handleError);
+  runResolver(routes, req.path, getLocals).then(matchPage).catch(handleError);
 };
 ```

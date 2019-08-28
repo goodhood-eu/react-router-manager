@@ -39,5 +39,5 @@ export const runResolver = (routes, path, getLocals = defaultGetLocals) => {
     return acc;
   }, []);
 
-  return promises;
+  return Promise.all(promises);
 };
