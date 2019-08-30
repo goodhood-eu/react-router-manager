@@ -20,14 +20,11 @@ export const renderRedirect = (route) => {
   const { statusCode, ...options } = route;
   const matchableProps = getMatchableRoute(options);
 
-  if (!statusCode) return <Redirect {...matchableProps} />;
+  const redirect = <Redirect {...matchableProps} />;
+  if (!statusCode) return redirect;
 
-  const { key, ...props } = matchableProps;
-  return (
-    <RouteStatus {...{ key, statusCode }} path={matchableProps.from}>
-      <Redirect {...props} />
-    </RouteStatus>
-  );
+  const { from, to, push, ...routeProps } = matchableProps;
+  return <RouteStatus {...routeProps} path={from}>{redirect}</RouteStatus>;
 };
 
 export const renderRoute = (route) => {
