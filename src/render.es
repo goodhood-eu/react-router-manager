@@ -60,7 +60,7 @@ const renderItem = (route, i) => {
   if (!route) return null;
   const { ...options } = route;
   if (!options.key) options.key = i;
-  const render = options.from ? renderRedirect : renderRoute;
+  const render = options.to ? renderRedirect : renderRoute;
   return render(options);
 };
 
