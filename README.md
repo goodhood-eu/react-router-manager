@@ -125,6 +125,8 @@ const getLocals = (details) => ({ ...details, store: reduxStore })
 Promise.all(runResolver(routes, pathname, getLocals));
 ```
 
+You might want to use `Promise.allSettled` on the server side to wait for every promise to resolve or reject. Or you can go for a "fail early" approach with `Promise.all` everywhere. Returning an array gives you that choice.
+
 ### renderRoutes
 This simply renders the route configuration for you. Pass directly into React Router like this:
 
