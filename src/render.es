@@ -24,7 +24,7 @@ export const renderRedirect = (route) => {
   if (!statusCode) return redirect;
 
   const { from, to, push, ...routeProps } = matchableProps;
-  return <RouteStatus {...routeProps} path={from}>{redirect}</RouteStatus>;
+  return <RouteStatus {...routeProps} {...{ statusCode, path: from }}>{redirect}</RouteStatus>;
 };
 
 export const renderRoute = (route) => {
