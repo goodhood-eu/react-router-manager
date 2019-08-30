@@ -121,8 +121,8 @@ const pathname = history.location.pathname; // for example
 // You can modify that object here as you wish.
 const getLocals = (details) => ({ ...details, store: reduxStore })
 
-// Once this promise is resolved it will get an array of resolved getResolver promises as an argument.
-runResolver(routes, pathname, getLocals);
+// You get back an array of promises to resolve as you will
+Promise.all(runResolver(routes, pathname, getLocals));
 ```
 
 ### renderRoutes
