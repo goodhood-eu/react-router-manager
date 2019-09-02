@@ -106,8 +106,8 @@ Alternatively simply create a static `resolver` method:
 ```js
 // You can return either a promise or an array of promises
 MyComponent.resolver = ({ match, route }) => ([
-  getMyAsyncDataAndReturnPromise(match.params, route.props.type)
-  andAnotherPromise(match.params)
+  getMyAsyncDataAndReturnPromise(match.params, route.props.type),
+  andAnotherPromise(match.params),
 ]);
 export default MyComponent;
 ```
