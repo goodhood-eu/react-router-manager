@@ -6,7 +6,7 @@
   "homepage": "https://goodhood.eu",
   "repository": "goodhood-eu/react-router-manager",
   "bugs": "https://github.com/goodhood-eu/react-router-manager/issues",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "engines": {
     "node": "^10.x.x"
   },
@@ -45,7 +45,7 @@
     "babel-plugin-add-module-exports": "^1.0.2",
     "babel-plugin-transform-node-env-inline": "^0.4.3",
     "babel-plugin-transform-react-remove-prop-types": "^0.4.24",
-    "eslint": "^6.2.2",
+    "eslint": "^6.3.0",
     "eslint-config-airbnb": "^18.0.1",
     "eslint-plugin-import": "^2.18.2",
     "eslint-plugin-jsx-a11y": "^6.2.1",

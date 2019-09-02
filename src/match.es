@@ -35,8 +35,8 @@ export const runResolver = (routes, path, getLocals = defaultGetLocals) => {
 
   const promises = matches.reduce((acc, details) => {
     const resolver = getResolver(details.route);
-    if (resolver) acc.push(resolver(getLocals(details)));
-    return acc;
+    if (!resolver) return acc;
+    return acc.concat(resolver(getLocals(details)));
   }, []);
 
   return promises;

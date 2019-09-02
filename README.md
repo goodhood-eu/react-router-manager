@@ -95,6 +95,7 @@ const MyComponent = (props) => {
   //...
 };
 
+// You can return either a promise or an array of promises
 const getResolver = ({ match, route }) => getMyAsyncDataAndReturnPromise();
 
 export default connectResolver(getResolver, MyComponent);
@@ -103,9 +104,11 @@ export default connectResolver(getResolver, MyComponent);
 Alternatively simply create a static `resolver` method:
 
 ```js
-MyComponent.resolver = ({ match, route }) => (
-  getMyAsyncDataAndReturnPromise(match.params, route.props.type)
-);
+// You can return either a promise or an array of promises
+MyComponent.resolver = ({ match, route }) => ([
+  getMyAsyncDataAndReturnPromise(match.params, route.props.type),
+  andAnotherPromise(match.params),
+]);
 export default MyComponent;
 ```
 
