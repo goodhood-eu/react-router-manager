@@ -6,7 +6,7 @@
   "homepage": "https://goodhood.eu",
   "repository": "goodhood-eu/react-router-manager",
   "bugs": "https://github.com/goodhood-eu/react-router-manager/issues",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "engines": {
     "node": "^10.x.x"
   },
@@ -27,12 +27,14 @@
     "reinstall": "rm -rf node_modules package-lock.json && npm install",
     "check": "npm run lint && echo \"\\033[0;32mReady to publish\\033[0m\"",
     "clean": "rm -rf ./lib/ || exit 1",
-    "build:babel": "NODE_ENV=production babel src --out-dir lib --copy-files",
-    "prepublishOnly": "npm run check && npm run clean && npm run build:babel",
+    "compile": "NODE_ENV=production babel src --out-dir lib --copy-files",
+    "minify": "find ./lib -name '*.js' -exec terser {} -o {} --config-file terser.json \\;",
+    "build": "npm run compile && npm run minify",
+    "prepublishOnly": "npm run check && npm run clean && npm run build",
     "lint": "eslint --ext .es,.js ./",
     "lint:tofile": "eslint --ext .es,.js --no-color -o ./eslint-report.log ./",
-    "test": "npm run build:babel && TZ='GMT' mocha \"test/*.js\"",
-    "test:tofile": "npm run build:babel && TZ='GMT' mocha --no-colors -R spec \"test/*.js\" 2>&1 | tee test-report.log"
+    "test": "npm run compile && TZ='GMT' mocha \"test/*.js\"",
+    "test:tofile": "npm run compile && TZ='GMT' mocha --no-colors -R spec \"test/*.js\" 2>&1 | tee test-report.log"
   },
   "devDependencies": {
     "@babel/cli": "^7.5.5",
@@ -53,7 +55,8 @@
     "eslint-plugin-react-hooks": "^1.7.0",
     "mocha": "^6.2.0",
     "react": "^16.9.0",
-    "react-router": "^5.0.1"
+    "react-router": "^5.0.1",
+    "terser": "^4.2.1"
   },
   "peerDependencies": {
     "react": "^16.9.0",
