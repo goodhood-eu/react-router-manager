@@ -1,6 +1,6 @@
 import React from 'react';
 import { Switch, Route, Redirect } from 'react-router';
-import { getMatchableRoute, decodeRouteParams } from './utils';
+import { getMatchableRoute, decodeMatchParams } from './utils';
 
 
 export const injectStatusCode = (context, statusCode) => {
@@ -39,8 +39,9 @@ export const renderRoute = (route) => {
   let nestedRoutes;
   if (Array.isArray(routes)) nestedRoutes = renderRoutes(routes);
 
-  const render = (rawRouteProps) => {
-    const routeProps = decodeRouteParams(rawRouteProps);
+  const render = ({ match: rawMatch, ...otherProps }) => {
+    const match = decodeMatchParams(rawMatch);
+    const routeProps = { ...otherProps, match };
     // Check if it is a simple redirect first
     const redirect = typeof onEnter === 'function' && onEnter(routeProps);
     if (redirect) return renderRedirect(typeof redirect === 'string' ? { to: redirect } : redirect);

@@ -2,7 +2,7 @@ const { assert } = require('chai');
 
 const {
   getMatchableRoute,
-  decodeRouteParams,
+  decodeMatchParams,
 } = require('../lib/utils');
 
 
@@ -14,7 +14,7 @@ describe('utils', () => {
     assert.deepEqual(getMatchableRoute({ path: '/test', exact: false }), { path: '/test', exact: false }, 'respects defaults and keeps unrelated props');
   });
 
-  it('decodeRouteParams', () => {
+  it('decodeMatchParams', () => {
     const props = { params: {} };
     const withParams = {
       params: {
@@ -30,9 +30,9 @@ describe('utils', () => {
         test2: 'i am a string with % signs',
       },
     };
-    assert.notEqual(decodeRouteParams(props), props, 'doesn\'t mutate object');
-    assert.notEqual(decodeRouteParams(props).params, props.params, 'doesn\'t mutate nested object');
-    assert.equal(decodeRouteParams(props).originalParams, props.params, 'preserves original params');
-    assert.deepEqual(decodeRouteParams(withParams), decoded, 'decodes params properly');
+    assert.notEqual(decodeMatchParams(props), props, 'doesn\'t mutate object');
+    assert.notEqual(decodeMatchParams(props).params, props.params, 'doesn\'t mutate nested object');
+    assert.equal(decodeMatchParams(props).originalParams, props.params, 'preserves original params');
+    assert.deepEqual(decodeMatchParams(withParams), decoded, 'decodes params properly');
   });
 });
