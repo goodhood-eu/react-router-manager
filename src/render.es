@@ -1,6 +1,6 @@
 import React from 'react';
 import { Switch, Route, Redirect } from 'react-router';
-import { getMatchableRoute } from './utils';
+import { getMatchableRoute, decodeRouteParams } from './utils';
 
 
 export const injectStatusCode = (context, statusCode) => {
@@ -39,7 +39,8 @@ export const renderRoute = (route) => {
   let nestedRoutes;
   if (Array.isArray(routes)) nestedRoutes = renderRoutes(routes);
 
-  const render = (routeProps) => {
+  const render = (rawRouteProps) => {
+    const routeProps = decodeRouteParams(rawRouteProps);
     // Check if it is a simple redirect first
     const redirect = typeof onEnter === 'function' && onEnter(routeProps);
     if (redirect) return renderRedirect(typeof redirect === 'string' ? { to: redirect } : redirect);

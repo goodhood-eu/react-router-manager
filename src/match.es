@@ -1,6 +1,6 @@
 import { matchPath } from 'react-router';
-import { getMatchableRoute } from './utils';
 import { getResolver } from './connect';
+import { getMatchableRoute, decodeRouteParams } from './utils';
 
 
 const defaultGetLocals = (data) => data;
@@ -12,9 +12,9 @@ const matchRoute = (routes, path) => {
     // It may be convenient to have `condition && route` in configuration objects, this allows it
     if (!route) continue;
     const matchableProps = getMatchableRoute(route);
-    const match = matchPath(path, matchableProps);
-    if (!match) continue;
-
+    const rawMatch = matchPath(path, matchableProps);
+    if (!rawMatch) continue;
+    const match = decodeRouteParams(match);
     matches.push({ route, match });
     if (Array.isArray(route.routes)) {
       const nested = matchRoute(route.routes, path);
