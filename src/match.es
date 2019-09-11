@@ -14,7 +14,7 @@ const matchRoute = (routes, path) => {
     const matchableProps = getMatchableRoute(route);
     const rawMatch = matchPath(path, matchableProps);
     if (!rawMatch) continue;
-    const match = decodeRouteParams(match);
+    const match = decodeRouteParams(rawMatch);
     matches.push({ route, match });
     if (Array.isArray(route.routes)) {
       const nested = matchRoute(route.routes, path);
