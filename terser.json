@@ -1,0 +1,5 @@
+{
+  "mangle": true,
+  "compress": { "drop_console": true },
+  "output": { "max_line_len": 64000 }
+}
