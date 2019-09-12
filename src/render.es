@@ -24,6 +24,9 @@ export const renderRedirect = (route) => {
   if (!statusCode) return redirect;
 
   const { from, to, push, ...routeProps } = matchableProps;
+
+  // We wrap the Redirect in Switch to reset React Router's path logic.
+  // Otherwise Redirect will ignore the `from` prop.
   return (
     <RouteStatus {...routeProps} {...{ statusCode, path: from }}>
       <Switch>{redirect}</Switch>
