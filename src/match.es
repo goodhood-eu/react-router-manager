@@ -1,6 +1,6 @@
 import { matchPath } from 'react-router';
-import { getMatchableRoute } from './utils';
 import { getResolver } from './connect';
+import { getMatchableRoute } from './utils';
 
 
 const defaultGetLocals = (data) => data;
@@ -14,7 +14,6 @@ const matchRoute = (routes, path) => {
     const matchableProps = getMatchableRoute(route);
     const match = matchPath(path, matchableProps);
     if (!match) continue;
-
     matches.push({ route, match });
     if (Array.isArray(route.routes)) {
       const nested = matchRoute(route.routes, path);
