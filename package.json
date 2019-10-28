@@ -6,10 +6,7 @@
   "homepage": "https://goodhood.eu",
   "repository": "goodhood-eu/react-router-manager",
   "bugs": "https://github.com/goodhood-eu/react-router-manager/issues",
-  "version": "2.3.0",
-  "engines": {
-    "node": "^10.x.x"
-  },
+  "version": "2.3.1",
   "keywords": [
     "react",
     "router",
@@ -37,30 +34,26 @@
     "test:tofile": "npm run compile && TZ='GMT' mocha --no-colors -R spec \"test/*.js\" 2>&1 | tee test-report.log"
   },
   "devDependencies": {
-    "@babel/cli": "^7.6.0",
-    "@babel/core": "^7.6.0",
+    "@babel/cli": "^7.6.4",
+    "@babel/core": "^7.6.4",
     "@babel/plugin-proposal-json-strings": "^7.0.0",
     "@babel/plugin-transform-strict-mode": "^7.0.0",
-    "@babel/preset-env": "^7.6.0",
-    "@babel/preset-react": "^7.0.0",
-    "@babel/runtime": "^7.6.0",
+    "@babel/preset-env": "^7.6.3",
+    "@babel/preset-react": "^7.6.3",
+    "@babel/runtime": "^7.6.3",
     "babel-plugin-add-module-exports": "^1.0.2",
     "babel-plugin-transform-node-env-inline": "^0.4.3",
     "babel-plugin-transform-react-remove-prop-types": "^0.4.24",
     "chai": "^4.2.0",
-    "eslint": "^6.3.0",
-    "eslint-config-airbnb": "^18.0.1",
-    "eslint-plugin-import": "^2.18.2",
-    "eslint-plugin-jsx-a11y": "^6.2.1",
-    "eslint-plugin-react": "^7.14.3",
-    "eslint-plugin-react-hooks": "^1.7.0",
-    "mocha": "^6.2.0",
-    "react": "^16.9.0",
-    "react-router": "^5.0.1",
+    "eslint": "^6.6.0",
+    "eslint-config-nebenan": "^1.0.2",
+    "mocha": "^6.2.2",
+    "react": "^16.11.0",
+    "react-router": "^5.1.2",
     "terser": "^4.2.1"
   },
   "peerDependencies": {
-    "react": "^16.9.0",
-    "react-router": "^5.0.1"
+    "react": "^16.11.0",
+    "react-router": "^5.1.2"
   }
 }
