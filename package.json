@@ -24,12 +24,12 @@
     "reinstall": "rm -rf node_modules package-lock.json && npm install",
     "check": "npm run lint && npm run test && echo \"\\033[0;32mReady to publish\\033[0m\"",
     "clean": "rm -rf ./lib/ || exit 1",
-    "build": "NODE_ENV=production babel src --out-dir lib --copy-files",
+    "build": "NODE_ENV=production babel src/**/*.jsx --out-dir lib --copy-files",
     "prepublishOnly": "npm run check && npm run clean && npm run build",
-    "eslint": "eslint -f codeframe \"./**/*.{js,jsx}\"",
+    "lint": "eslint -f codeframe \"./**/*.{js,jsx}\"",
     "lint:tofile": "eslint -f codeframe \"./**/*.{js,jsx}\" --no-color -o ./eslint-report.log ./",
-    "test": "npm run build && TZ='GMT' mocha \"./{,!(node_modules)/**}/*.test.{js,jsx}\"",
-    "test:tofile": "npm run build && TZ='GMT' mocha --no-colors -R spec \"./{,!(node_modules)/**}/*.test.{js,jsx}\" 2>&1 | tee test-report.log"
+    "test": "TZ='GMT' mocha \"./{,!(node_modules)/**}/*.test.{js,jsx}\"",
+    "test:tofile": "TZ='GMT' mocha --no-colors -R spec \"./{,!(node_modules)/**}/*.test.{js,jsx}\" 2>&1 | tee test-report.log"
   },
   "devDependencies": {
     "@babel/cli": "^7.8.4",
@@ -39,6 +39,7 @@
     "@babel/plugin-transform-strict-mode": "^7.8.3",
     "@babel/preset-env": "^7.9.6",
     "@babel/preset-react": "^7.9.4",
+    "@babel/register": "^7.9.0",
     "@babel/runtime": "^7.9.6",
     "babel-plugin-add-module-exports": "^1.0.2",
     "babel-plugin-transform-node-env-inline": "^0.4.3",

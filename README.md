@@ -1,7 +1,7 @@
 react-router-manager
 ====================
 
-React Router server side rendering with data fetching. This module is heavily based on [react-router-config](https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config) and expands on the same concepts. The goal is to create a one stop solution for routing and data fetching on both client and server. It is particularly useful for people migrating from [redial](https://github.com/markdalgleish/redial).
+React Router server side rendering with data fetching. This module is based on [react-router-config](https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config) and expands on the same concepts. The goal is to create a one stop solution for routing and data fetching on both client and server. It is particularly useful for people migrating from [redial](https://github.com/markdalgleish/redial).
 
 ## Installation
 
@@ -11,7 +11,7 @@ npm install --save react-router-manager
 
 ## Usage
 
-There are 2 distinct stages to working with this library, the first is data fetching and the second is routing. In order for both to work you need to create "route configs". These configs allow for both routing and data fetching to work. Please use them for every route that needs to fetch data.
+There are 2 distinct stages to working with this library, the first is data fetching and the second is rendering. In order for both to work you need to create "route configs". These configs allow for both routing and data fetching to work. Please use them for every route that needs to fetch data.
 
 **IMPORTANT**: the utilities here default to `exact: true` for route matching, which is the opposite of what Route components in React Router do. Partial matching is prone to errors and creates more issues than it solves. Override it on per route basis if needed.
 
@@ -21,18 +21,20 @@ A route config is an array of objects like this:
 
 ```js
 [
-  // A simple route
+  // A Route
   {
     // The only difference with default Route paths is that you need
-    // to use "*" for match-all data fetching and onEnter checks.
+    // to use "*" for match-all data fetching and intercept functions.
     path: '/stuff/:id?',
 
-    // This will be called before the route is rendered and allows to add checks for path parameters
-    // as well as authentication checks
-    onEnter: ({ match, location, history, staticContext }) => {
-      // Simply return a new path or a Redirect configuration object.
-      // When a falsy value is returned the route is handled normally.
-      if (match.params.id === '0') return '/stuff/31337';
+    // This will be called both before the route data is fetched and before the route is rendered.
+    // It allows you to completely rewrite the route object and return different components
+    // or redirect conditionally. Return a new route configuration object here.
+    // Anything except `path` and `intercept` can be returned (overriden).
+    intercept: ({ match, location, route }) => {
+      // Simply return a Route or a Redirect configuration object.
+      if (match.params.id === '0') return { to: '/path/otherstuff' };
+      return { component: MyComponent };
     },
 
     // These props will be passed on to the component and also available in the data fetching function
@@ -43,16 +45,17 @@ A route config is an array of objects like this:
     // Component to render
     component: MyComponent,
 
-    // You may create your own render function if you wish. It will receive the usual arguments along with
-    // `nestedRoutes` which is the rendered nested routes for this route or undefined
-    render: ({ match, location, history, staticContext, nestedRoutes }) => {
-      return <MyComponent>{nestedRoutes}</MyComponent>;
+    // You may create your own render function if you wish. It will receive the usual arguments
+    // along with `children` which is the rendered nested routes for this route (or null).
+    // NOTE: This way data fetching will not work for this route as it relies on `component` prop.
+    render: ({ match, location, history, staticContext, children }) => {
+      return <MyComponent>{children}</MyComponent>;
     }
 
     // Useful for handling 404s, but you can use it in any case.
     statusCode: 404,
 
-    // You can create nested routes like this.
+    // You can nest routes like this.
     routes: [
       // {...}
     ],
@@ -74,7 +77,6 @@ A route config is an array of objects like this:
     // ...
   },
 
-  // Any falsy values in these arrays are ignored
   myCondition && {
     from: '/old',
     to: '/new',
@@ -82,26 +84,14 @@ A route config is an array of objects like this:
 
   //...
 ]
+// Use this if you had any conditions, any falsy values in these arrays will get filtered out
+.filter(Boolean)
 ```
-Every route must have either `component`, `render` or `onEnter` for rendering. For data fetching to work `component` is required. Everything else is optional.
+Every route must have either `component`, `render` or `intercept` for rendering. For data fetching to work `component` is required. Everything else is optional.
 
-### connectResolver
+### Connecting components
 
-To specify a data fetching function you simply wrap your component in a `connectResolver` like in a HOC.
-
-```js
-import { connectResolver } from 'react-router-manager';
-const MyComponent = (props) => {
-  //...
-};
-
-// You can return either a promise or an array of promises
-const getResolver = ({ match, route }) => getMyAsyncDataAndReturnPromise();
-
-export default connectResolver(getResolver, MyComponent);
-```
-
-Alternatively simply create a static `resolver` method:
+To specify a data fetching function you need to create a static `resolver` method:
 
 ```js
 // You can return either a promise or an array of promises
@@ -118,14 +108,14 @@ When you are ready to collect your promises and fetch the data use `runResolver`
 ```js
 import { runResolver } from './modules/resolver';
 const routes = [/* routes config */];
-const pathname = history.location.pathname; // for example
+const { location } = history;
 
-// By default each `getResolver` function gets { match, route } object as an argument.
+// By default each `getResolver` function gets { match, route, location } object as an argument.
 // You can modify that object here as you wish.
-const getLocals = (details) => ({ ...details, store: reduxStore })
+const getLocals = (request) => ({ ...request, store: reduxStore })
 
 // You get back an array of promises to resolve as you will
-Promise.all(runResolver(routes, pathname, getLocals));
+Promise.all(runResolver(routes, location, getLocals));
 ```
 
 You might want to use `Promise.allSettled` on the server side to wait for every promise to resolve or reject. Or you can go for a "fail early" approach with `Promise.all` everywhere. Returning an array gives you that choice.
@@ -134,7 +124,7 @@ You might want to use `Promise.allSettled` on the server side to wait for every 
 This simply renders the route configuration for you. Pass directly into React Router like this:
 
 ```js
-import { renderRoutes } from 'react-router-manager';
+import RouterManager from 'react-router-manager';
 import { Router } from 'react-router';
 import { createBrowserHistory } from 'history';
 import { hydrate } from 'react-dom';
@@ -142,7 +132,7 @@ import { hydrate } from 'react-dom';
 const routes = [/* routes config */];
 
 hydrate(
-  <Router history={createBrowserHistory()}>{renderRoutes(routes)}</Router>,
+  <Router history={createBrowserHistory()}><RouterManager routes={routes} /></Router>,
   document.getElementById('root')
 );
 ```
@@ -157,7 +147,7 @@ import { injectStatusCode } from 'react-router-manager';
 
 const MyComponent = (props) => {
   // Simply injects statusCode when static context is available. Use in any Component where
-  // route information is connected: a component rendered by a Route or wrapped in withRouter
+  // route information is available.
   injectStatusCode(props.staticContext, 403);
   //...
 };
@@ -178,28 +168,28 @@ const MyComponent = (props) => {
 };
 ```
 
-### renderRoute
+### Route
 ```js
-import { renderRoute } from 'react-router-manager';
+import { Route } from 'react-router-manager';
 const route = {
   path: '/stuff/:id?',
   component: MyComponent,
 };
 
 // Will simply render a single route
-const renderedRoute = renderRoute(route);
+return <Route route={route} />;
 ```
 
-### renderRedirect
+### Redirect
 ```js
-import { renderRedirect } from 'react-router-manager';
+import { Redirect } from 'react-router-manager';
 
 const route =   {
   from: '/this/:id',
   to: '/that/:id',
 },
 // Will simply render a single redirect
-const renderedRedirect = renderRedirect(route);
+return <Redirect route={route} />;
 ```
 
 ## A complete example
@@ -211,7 +201,7 @@ import { render, hydrate } from 'react-dom';
 
 import { Router } from 'react-router';
 import { createBrowserHistory } from 'history';
-import { runResolver, renderRoutes } from 'react-router-manager';
+import RouterManager, { runResolver } from 'react-router-manager';
 
 import routes from './routes';
 
@@ -220,7 +210,7 @@ import routes from './routes';
 const isAppPrerendered = global.__APP_PRERENDERED__;
 
 const renderPage = (history, routes) => {
-  const content = <Router history={history}>{renderRoutes(routes)}</Router>
+  const content = <Router history={history}><RouterManager routes={routes} /></Router>
 
   const renderer = isAppPrerendered ? hydrate : render;
   return renderer(content, document.getElementById('main'));
@@ -230,9 +220,7 @@ const startRouter = (store, history) => {
   let shouldFetch = !isAppPrerendered;
 
   const handleFetch = (location) => {
-    const { pathname } = location;
-    const getLocals = (details) => ({ ...details, location });
-    if (shouldFetch) runResolver(routes, pathname, getLocals);
+    if (shouldFetch) runResolver(routes, location);
     shouldFetch = true;
   };
 
@@ -251,29 +239,30 @@ startRouter(store, history);
 An expressjs middleware on the server side:
 
 ```js
-const React = require('react');
-const { renderToString } = require('react-dom/server');
+import React from 'react';
+import { renderToString } from 'react-dom/server';
 
-const { StaticRouter } = require('react-router');
-const { createLocation } = require('history');
-const { runResolver, renderRoutes } = require('react-router-manager');
+import { StaticRouter } from 'react-router';
+import { createLocation } from 'history';
+import RouterManager, { runResolver } from 'react-router-manager';
 
-const routes = require('./client/routes');
+import routes from './client/routes';
 
 
-const renderContent = ({ routes, context, location }) => {
-  const content = React.createElement(StaticRouter, { context, location }, renderRoutes(routes));
+const renderContent = (routes, context, location) => {
+  const content = (
+    <StaticRouter {...{ context, location }}><RouterManager routes={routes} /></StaticRouter>
+  );
   return renderToString(content);
 };
 
-module.exports = (req, res) => {
+export default (req, res) => {
   const location = createLocation(req.url);
-  const getLocals = (details) => ({ ...details, store, location });
 
   const matchPage = (result, error) => {
     const data = error ? {} : result;
     const context = {};
-    const content = renderContent({ routes, context, location: req.url });
+    const content = renderContent(routes, context, req.url);
 
     if (context.url) return res.redirect(context.statusCode || 301, context.url);
     // In your template serialize data into `__APP_PRERENDERED__`;
@@ -285,6 +274,6 @@ module.exports = (req, res) => {
     matchPage(null, error);
   };
 
-  runResolver(routes, req.path, getLocals).then(matchPage).catch(handleError);
+  runResolver(routes, location).then(matchPage).catch(handleError);
 };
 ```

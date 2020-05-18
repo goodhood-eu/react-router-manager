@@ -1,7 +1,7 @@
 {
   "extends": "nebenan",
   "overrides": [{
-    "files": ["**/*.test.js", "**/*.test.jsx"],
+    "files": ["**/*.test.js"],
     "env": {
       "mocha": true
     },

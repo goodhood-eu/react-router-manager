@@ -1,22 +1,32 @@
 import { matchPath } from 'react-router';
-import { getResolver } from './connect';
-import { getMatchableRoute } from './utils';
+import { isFunction, getMatchableRoute } from './utils';
 
+export const defaultGetLocals = (data) => data;
 
-const defaultGetLocals = (data) => data;
+export const getResolver = (request) => {
+  const { route: originalRoute } = request;
 
-const matchRoute = (routes, path) => {
+  const { intercept } = originalRoute;
+  const route = isFunction(intercept) ? intercept(request) : originalRoute;
+
+  const { component } = route;
+  if (!component) return null;
+
+  return component.resolver;
+};
+
+const matchRoute = (routes, pathname) => {
   let matches = [];
 
   for (const route of routes) {
-    // It may be convenient to have `condition && route` in configuration objects, this allows it
-    if (!route) continue;
     const matchableProps = getMatchableRoute(route);
-    const match = matchPath(path, matchableProps);
+    const match = matchPath(pathname, matchableProps);
     if (!match) continue;
+
     matches.push({ route, match });
+
     if (Array.isArray(route.routes)) {
-      const nested = matchRoute(route.routes, path);
+      const nested = matchRoute(route.routes, pathname);
       if (nested) matches = matches.concat(nested);
     }
 
@@ -28,15 +38,13 @@ const matchRoute = (routes, path) => {
   return null;
 };
 
-export const runResolver = (routes, path, getLocals = defaultGetLocals) => {
-  const matches = matchRoute(routes, path);
-  if (!matches || !matches.length) return [];
+export const runResolver = (routes, location, getLocals = defaultGetLocals) => {
+  const matches = matchRoute(routes, location.pathname) || [];
 
-  const promises = matches.reduce((acc, details) => {
-    const resolver = getResolver(details.route);
+  return matches.reduce((acc, details) => {
+    const request = { location, ...details };
+    const resolver = getResolver(request);
     if (!resolver) return acc;
-    return acc.concat(resolver(getLocals(details)));
+    return acc.concat(resolver(getLocals(request)));
   }, []);
-
-  return promises;
 };

@@ -1,3 +1,2 @@
-export { connectResolver } from './connect';
 export { runResolver } from './match';
-export { injectStatusCode, RouteStatus, renderRedirect, renderRoute, renderRoutes } from './render';
+export { injectStatusCode, RouteStatus, Redirect, Route, RouterManager as default } from './render';

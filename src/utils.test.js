@@ -1,11 +1,27 @@
 const { assert } = require('chai');
 
 const {
+  isNumber,
+  isFunction,
   getMatchableRoute,
-} = require('../lib/utils');
+} = require('./utils');
 
 
 describe('utils', () => {
+  it('isNumber', () => {
+    assert.isTrue(isNumber(0), 'number');
+    assert.isFalse(isNumber('0'), 'string');
+    assert.isFalse(isNumber(null), 'null');
+    assert.isFalse(isNumber(), 'undefined');
+  });
+
+  it('isFunction', () => {
+    assert.isTrue(isFunction(() => {}), 'func');
+    assert.isFalse(isFunction('0'), 'string');
+    assert.isFalse(isFunction(null), 'null');
+    assert.isFalse(isFunction(), 'undefined');
+  });
+
   it('getMatchableRoute', () => {
     const defaults = { exact: true, strict: true, sensitive: false };
     const inverted = { exact: false, strict: false, sensitive: true };
