@@ -32,6 +32,9 @@ A route config is an array of objects like this:
     // or redirect conditionally. Return a new route configuration object here.
     // Anything except `path` and `intercept` can be returned (overriden).
     intercept: ({ match, location, route }) => {
+      // Returning null will prevent fetching and rendering of the entire subtree.
+      if (!isAuthorized()) return null;
+
       // Simply return a Route or a Redirect configuration object.
       if (match.params.id === '0') return { to: '/path/otherstuff' };
       return { component: MyComponent };
@@ -171,25 +174,17 @@ const MyComponent = (props) => {
 ### Route
 ```js
 import { Route } from 'react-router-manager';
-const route = {
-  path: '/stuff/:id?',
-  component: MyComponent,
-};
 
 // Will simply render a single route
-return <Route route={route} />;
+return <Route path="/stuff/:id?" component={MyComponent} />;
 ```
 
 ### Redirect
 ```js
 import { Redirect } from 'react-router-manager';
 
-const route =   {
-  from: '/this/:id',
-  to: '/that/:id',
-},
 // Will simply render a single redirect
-return <Redirect route={route} />;
+return <Redirect from="/this/:id" to="/that/:id" />;
 ```
 
 ## A complete example
