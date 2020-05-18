@@ -1,5 +1,3 @@
-/* eslint no-use-before-define: "off" */
-
 import React from 'react';
 import { Switch, Route as RawRoute, Redirect as RawRedirect } from 'react-router';
 import { isNumber, isFunction, getMatchableRoute } from './utils';
