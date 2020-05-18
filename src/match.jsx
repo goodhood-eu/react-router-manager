@@ -9,10 +9,9 @@ export const getResolver = (request) => {
   const { intercept } = originalRoute;
   const route = isFunction(intercept) ? intercept(request) : originalRoute;
 
-  const { component } = route;
-  if (!component) return null;
-
-  return component.resolver;
+  if (!route || !route.component) return null;
+  const { resolver } = route.component;
+  return isFunction(resolver) ? resolver : null;
 };
 
 const matchRoute = (routes, pathname) => {

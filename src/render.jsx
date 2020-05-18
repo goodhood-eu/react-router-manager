@@ -27,13 +27,13 @@ export const RouteStatus = ({ statusCode, children, ...props }) => {
   return <RawRoute {...getMatchableRoute(props)} render={render} />;
 };
 
-export const Redirect = ({ route }) => {
-  const { statusCode, ...props } = route;
+export const Redirect = (props) => {
+  const { statusCode, ...route } = props;
 
-  const redirect = <RawRedirect {...getMatchableRoute(props)} />;
+  const redirect = <RawRedirect {...getMatchableRoute(route)} />;
   if (!statusCode) return redirect;
 
-  const { from, to, push, ...routeProps } = props;
+  const { from, to, push, ...routeProps } = route;
 
   // We wrap the Redirect in Switch to reset React Router's path logic.
   // Otherwise Redirect will ignore the `from` prop.
@@ -44,21 +44,22 @@ export const Redirect = ({ route }) => {
   );
 };
 
-export const Route = ({ route: originalRoute }) => {
-  if (!isActionableRoute(originalRoute)) {
-    console.error('Detected a useless route in your configuration', originalRoute);
+export const Route = (props) => {
+  if (!isActionableRoute(props)) {
+    console.error('Detected a useless route in your configuration', props);
     return null;
   }
 
   const renderProp = (routeProps) => {
-    const { intercept } = originalRoute;
-    const request = getRequestProps(routeProps, originalRoute);
+    const { intercept } = props;
+    const request = getRequestProps(routeProps, props);
+    const route = isFunction(intercept) ? intercept(request) : props;
 
-    const route = isFunction(intercept) ? intercept(request) : originalRoute;
+    // Might need to bail from rendering completely
+    if (!route) return null;
     if (route.to) return <Redirect route={route} />;
 
-    const { component: RouteComponent, statusCode, props, routes, render } = route;
-
+    const { component: RouteComponent, statusCode, props: componentProps, routes, render } = route;
     // Route is to be handled here, set statusCode
     injectStatusCode(routeProps.staticContext, statusCode);
 
@@ -67,10 +68,10 @@ export const Route = ({ route: originalRoute }) => {
     // Attempt to render
     if (isFunction(render)) return render({ ...routeProps, children });
     if (!RouteComponent) return children;
-    return <RouteComponent {...routeProps} {...props}>{children}</RouteComponent>;
+    return <RouteComponent {...routeProps} {...componentProps}>{children}</RouteComponent>;
   };
 
-  return <RawRoute {...getMatchableRoute(getRouteProps(originalRoute))} render={renderProp} />;
+  return <RawRoute {...getMatchableRoute(getRouteProps(props))} render={renderProp} />;
 };
 
 const renderItem = (route, index) => {

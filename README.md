@@ -110,7 +110,7 @@ import { runResolver } from './modules/resolver';
 const routes = [/* routes config */];
 const { location } = history;
 
-// By default each `getResolver` function gets { match, route, location } object as an argument.
+// By default each static resolver method gets { match, route, location } object as an argument.
 // You can modify that object here as you wish.
 const getLocals = (request) => ({ ...request, store: reduxStore })
 

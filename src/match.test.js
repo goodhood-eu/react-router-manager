@@ -14,8 +14,8 @@ describe('match', () => {
   });
 
   it('getResolver', () => {
-    const resolverA = 1;
-    const resolverB = 2;
+    const resolverA = () => 1;
+    const resolverB = () => 2;
 
     const objA = {
       route: {
@@ -50,11 +50,27 @@ describe('match', () => {
       },
     };
 
+    const objG = {
+      route: {
+        intercept: () => null,
+      },
+    };
+
+    const objH = {
+      route: {
+        component: {
+          resolver: 123,
+        },
+      },
+    };
+
     assert.equal(getResolver(objA), resolverA, 'finds simple resolver');
     assert.isNull(getResolver(objB), 'returns nothing on redirect');
     assert.equal(getResolver(objC), resolverB, 'intercepted');
     assert.equal(getResolver(objD), resolverA, 'incorrect interceptor');
     assert.isNull(getResolver(objE), 'no component');
     assert.isNull(getResolver(objF), 'interceptor returned no component');
+    assert.isNull(getResolver(objG), 'interceptor returned null');
+    assert.isNull(getResolver(objH), 'resolver is not a fn');
   });
 });
