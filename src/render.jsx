@@ -75,8 +75,8 @@ export const Route = (props) => {
 };
 
 const renderItem = (route, index) => {
-  const { to, key, hook } = route;
-  const Component = (to && !isFunction(hook)) ? Redirect : Route;
+  const { to, key, intercept } = route;
+  const Component = (to && !isFunction(intercept)) ? Redirect : Route;
   return <Component {...route} key={key ? `${key}${index}` : index} />;
 };
 
