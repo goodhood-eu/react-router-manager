@@ -1,5 +1,5 @@
 import React from 'react';
-import { Switch, Route as RawRoute, Redirect as RawRedirect } from 'react-router';
+import { Switch, Route, Redirect } from 'react-router';
 import { isNumber, isFunction, getMatchableRoute } from './utils';
 
 export const getRouteProps = ({
@@ -24,13 +24,16 @@ export const RouteStatus = ({ statusCode, children, ...props }) => {
     return children;
   };
 
-  return <RawRoute {...getMatchableRoute(props)} render={render} />;
+  return <Route {...getMatchableRoute(props)} render={render} />;
 };
 
-export const Redirect = (props) => {
+// These render* functions intentionally written and used as simple functions and not React
+// components. It is done so because ReactRouter breaks silently when there are any nodes
+// rendered between Router/Switch/Route|Redirect components. This workaround solves that problem.
+export const renderRedirect = (props) => {
   const { statusCode, ...route } = props;
 
-  const redirect = <RawRedirect {...getMatchableRoute(route)} />;
+  const redirect = <Redirect {...getMatchableRoute(route)} />;
   if (!statusCode) return redirect;
 
   const { from, to, push, ...routeProps } = route;
@@ -44,7 +47,7 @@ export const Redirect = (props) => {
   );
 };
 
-export const Route = (props) => {
+export const renderRoute = (props) => {
   if (!isActionableRoute(props)) {
     console.error('Detected a useless route in your configuration', props);
     return null;
@@ -57,13 +60,14 @@ export const Route = (props) => {
 
     // Might need to bail from rendering completely
     if (!route) return null;
-    if (route.to) return <Redirect route={route} />;
+    if (route.to) return renderRedirect(route);
 
     const { component: RouteComponent, statusCode, props: componentProps, routes, render } = route;
     // Route is to be handled here, set statusCode
     injectStatusCode(routeProps.staticContext, statusCode);
 
-    const children = Array.isArray(routes) ? <RouterManager routes={routes} /> : null;
+    // eslint-disable-next-line no-use-before-define
+    const children = Array.isArray(routes) ? renderRoutes({ routes }) : null;
 
     // Attempt to render
     if (isFunction(render)) return render({ ...routeProps, children });
@@ -71,16 +75,18 @@ export const Route = (props) => {
     return <RouteComponent {...routeProps} {...componentProps}>{children}</RouteComponent>;
   };
 
-  return <RawRoute {...getMatchableRoute(getRouteProps(props))} render={renderProp} />;
+  return <Route {...getMatchableRoute(getRouteProps(props))} render={renderProp} />;
 };
 
 const renderItem = (route, index) => {
   const { to, key, intercept } = route;
-  const Component = (to && !isFunction(intercept)) ? Redirect : Route;
-  return <Component {...route} key={key ? `${key}${index}` : index} />;
+  const render = (to && !isFunction(intercept)) ? renderRedirect : renderRoute;
+  return render({ ...route, key: key ? `${key}${index}` : index });
 };
 
-export const RouterManager = ({ routes }) => {
+export const renderRoutes = ({ routes }) => {
   if (!routes || !routes.length) return null;
   return <Switch>{routes.map(renderItem)}</Switch>;
 };
+
+export { renderRedirect as Redirect, renderRoute as Route, renderRoutes as default };

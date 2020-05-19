@@ -123,8 +123,8 @@ Promise.all(runResolver(routes, location, getLocals));
 
 You might want to use `Promise.allSettled` on the server side to wait for every promise to resolve or reject. Or you can go for a "fail early" approach with `Promise.all` everywhere. Returning an array gives you that choice.
 
-### renderRoutes
-This simply renders the route configuration for you. Pass directly into React Router like this:
+### RouterManager or renderRoutes
+This simply renders the route configuration for you. This is a default export and you can use it as a function or as a component. Pass directly into React Router like this:
 
 ```js
 import RouterManager from 'react-router-manager';
@@ -136,6 +136,17 @@ const routes = [/* routes config */];
 
 hydrate(
   <Router history={createBrowserHistory()}><RouterManager routes={routes} /></Router>,
+  document.getElementById('root')
+);
+```
+
+Alternatively:
+
+```js
+import renderRoutes from 'react-router-manager';
+// ...
+hydrate(
+  <Router history={createBrowserHistory()}>{renderRoutes({ routes })}</Router>,
   document.getElementById('root')
 );
 ```
@@ -172,6 +183,8 @@ const MyComponent = (props) => {
 ```
 
 ### Route
+You can use it as a function or as a component.
+
 ```js
 import { Route } from 'react-router-manager';
 
@@ -179,12 +192,32 @@ import { Route } from 'react-router-manager';
 return <Route path="/stuff/:id?" component={MyComponent} />;
 ```
 
+Alternatively:
+
+```js
+import { Route as renderRoute } from 'react-router-manager';
+
+// Will simply render a single route
+return renderRoute({ path: '/stuff/:id?', component: MyComponent });
+```
+
 ### Redirect
+You can use it as a function or as a component.
+
 ```js
 import { Redirect } from 'react-router-manager';
 
 // Will simply render a single redirect
 return <Redirect from="/this/:id" to="/that/:id" />;
+```
+
+Alternatively:
+
+```js
+import { Redirect as renderRedirect } from 'react-router-manager';
+
+// Will simply render a single route
+return renderRedirect({ from: '/this/:id', to: '/that/:id' });
 ```
 
 ## A complete example
