@@ -36,7 +36,7 @@ A route config is an array of objects like this:
       if (!isAuthorized()) return null;
 
       // Simply return a Route or a Redirect configuration object.
-      if (match.params.id === '0') return { to: '/path/otherstuff' };
+      if (match.params.id === '0') return { to: '/otherstuff' };
       return { component: MyComponent };
     },
 
@@ -80,6 +80,7 @@ A route config is an array of objects like this:
     // ...
   },
 
+  // To use syntax like this also use a `.filter` function at the end
   myCondition && {
     from: '/old',
     to: '/new',
@@ -124,7 +125,7 @@ Promise.all(runResolver(routes, location, getLocals));
 You might want to use `Promise.allSettled` on the server side to wait for every promise to resolve or reject. Or you can go for a "fail early" approach with `Promise.all` everywhere. Returning an array gives you that choice.
 
 ### RouterManager or renderRoutes
-This simply renders the route configuration for you. This is a default export and you can use it as a function or as a component. Pass directly into React Router like this:
+This simply renders the route configuration for you. This is the default export and you can use it as a function or as a component. Pass directly into React Router like this:
 
 ```js
 import RouterManager from 'react-router-manager';
@@ -153,7 +154,7 @@ hydrate(
 
 ### Utility functions
 
-These are used internally, but you might want to use them too..
+These are used internally, but you might want to use them too.
 
 ### injectStatusCode
 ```js

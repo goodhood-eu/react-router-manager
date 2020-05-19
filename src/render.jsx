@@ -3,7 +3,7 @@ import { Switch, Route, Redirect } from 'react-router';
 import { isNumber, isFunction, getMatchableRoute } from './utils';
 
 export const getRouteProps = ({
-  component, statusCode, props, routes, intercept, ...cleanProps
+  intercept, props, component, render, statusCode, routes, ...cleanProps
 }) => (
   cleanProps
 );
@@ -19,15 +19,15 @@ export const injectStatusCode = (context = {}, statusCode) => {
 };
 
 export const RouteStatus = ({ statusCode, children, ...props }) => {
-  const render = ({ staticContext }) => {
+  const renderProp = ({ staticContext }) => {
     injectStatusCode(staticContext, statusCode);
     return children;
   };
 
-  return <Route {...getMatchableRoute(props)} render={render} />;
+  return <Route {...getMatchableRoute(props)} render={renderProp} />;
 };
 
-// These render* functions intentionally written and used as simple functions and not React
+// These render* functions are intentionally written and used as simple functions and not React
 // components. It is done so because ReactRouter breaks silently when there are any nodes
 // rendered between Router/Switch/Route|Redirect components. This workaround solves that problem.
 export const renderRedirect = (props) => {
@@ -62,7 +62,7 @@ export const renderRoute = (props) => {
     if (!route) return null;
     if (route.to) return renderRedirect(route);
 
-    const { component: RouteComponent, statusCode, props: componentProps, routes, render } = route;
+    const { statusCode, routes, render, component: RouteComponent, props: componentProps } = route;
     // Route is to be handled here, set statusCode
     injectStatusCode(routeProps.staticContext, statusCode);
 
