@@ -18,7 +18,7 @@ export const injectStatusCode = (context = {}, statusCode) => {
   if (isNumber(statusCode)) context.statusCode = statusCode;
 };
 
-export const RouteStatus = ({ statusCode, children, ...props }) => {
+export const renderRouteStatus = ({ statusCode, children, ...props }) => {
   const renderProp = ({ staticContext }) => {
     injectStatusCode(staticContext, statusCode);
     return children;
@@ -37,14 +37,11 @@ export const renderRedirect = (props) => {
   if (!statusCode) return redirect;
 
   const { from, to, push, ...routeProps } = route;
+  const children = <Switch>{redirect}</Switch>;
 
   // We wrap the Redirect in Switch to reset React Router's path logic.
   // Otherwise Redirect will ignore the `from` prop.
-  return (
-    <RouteStatus {...routeProps} {...{ statusCode, path: from }}>
-      <Switch>{redirect}</Switch>
-    </RouteStatus>
-  );
+  return renderRouteStatus({ ...routeProps, statusCode, path: from, children });
 };
 
 export const renderRoute = (props) => {
@@ -89,4 +86,9 @@ export const renderRoutes = ({ routes }) => {
   return <Switch>{routes.map(renderItem)}</Switch>;
 };
 
-export { renderRedirect as Redirect, renderRoute as Route, renderRoutes as default };
+export {
+  renderRouteStatus as RouteStatus,
+  renderRedirect as Redirect,
+  renderRoute as Route,
+  renderRoutes as default,
+};
