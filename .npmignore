@@ -1,8 +1,9 @@
 !lib/
 src/
-test/
 .babelrc
+.browserslistrc
 .eslintignore
 .eslintrc
 .gitignore
+.mocharc.js
 .npmignore
