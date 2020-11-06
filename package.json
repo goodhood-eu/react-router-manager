@@ -6,7 +6,7 @@
   "homepage": "https://goodhood.eu",
   "repository": "goodhood-eu/react-router-manager",
   "bugs": "https://github.com/goodhood-eu/react-router-manager/issues",
-  "version": "3.0.0",
+  "version": "3.1.0",
   "keywords": [
     "react",
     "router",
@@ -32,6 +32,7 @@
     "test:tofile": "TZ='GMT' mocha --no-colors -R spec \"./{,!(node_modules)/**}/*.test.{js,jsx}\" 2>&1 | tee test-report.log"
   },
   "devDependencies": {
+    "browserslist-config-nebenan": "^1.0.0",
     "@babel/cli": "^7.10.1",
     "@babel/core": "^7.10.2",
     "@babel/plugin-proposal-json-strings": "^7.10.1",
