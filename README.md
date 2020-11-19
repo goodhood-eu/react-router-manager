@@ -225,7 +225,6 @@ return renderRedirect({ from: '/this/:id', to: '/that/:id' });
 
 On the client side:
 ```js
-import React from 'react';
 import { render, hydrate } from 'react-dom';
 
 import { Router } from 'react-router';
@@ -268,7 +267,6 @@ startRouter(store, history);
 An expressjs middleware on the server side:
 
 ```js
-import React from 'react';
 import { renderToString } from 'react-dom/server';
 
 import { StaticRouter } from 'react-router';

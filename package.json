@@ -6,7 +6,7 @@
   "homepage": "https://goodhood.eu",
   "repository": "goodhood-eu/react-router-manager",
   "bugs": "https://github.com/goodhood-eu/react-router-manager/issues",
-  "version": "3.2.0",
+  "version": "3.2.1",
   "keywords": [
     "react",
     "router",
@@ -18,6 +18,10 @@
     "server rendering",
     "fetching",
     "data fetching"
+  ],
+  "files": [
+    "lib/*.js",
+    "lib/*/*.js"
   ],
   "main": "lib/index.js",
   "scripts": {
