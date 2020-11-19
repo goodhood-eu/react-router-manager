@@ -19,6 +19,10 @@
     "fetching",
     "data fetching"
   ],
+  "files": [
+    "lib/*.js",
+    "lib/*/*.js"
+  ],
   "main": "lib/index.js",
   "scripts": {
     "reinstall": "rm -rf node_modules package-lock.json && npm install",
