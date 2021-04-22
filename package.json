@@ -6,7 +6,7 @@
   "homepage": "https://goodhood.eu",
   "repository": "goodhood-eu/react-router-manager",
   "bugs": "https://github.com/goodhood-eu/react-router-manager/issues",
-  "version": "3.2.1",
+  "version": "3.2.2",
   "keywords": [
     "react",
     "router",
