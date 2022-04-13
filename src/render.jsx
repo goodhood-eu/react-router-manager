@@ -44,7 +44,10 @@ export const renderRedirect = (props) => {
       <Route
         {...matchableRoute}
         path={from}
-        component={({ url = to }) => <AbsoluteRedirect to={url} />}
+        component={() => {
+          window.location.replace(to);
+          return null;
+        }}
       />
     )
     : <Redirect {...matchableRoute} />;
