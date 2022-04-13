@@ -1,5 +1,10 @@
 import { Switch, Route, Redirect } from 'react-router';
-import { isNumber, isFunction, getMatchableRoute } from './utils';
+import { isNumber, isFunction, getMatchableRoute, isAbsoluteUrl } from './utils';
+
+export const AbsoluteRedirect = ({ to }) => {
+  window.location.replace(to);
+  return null;
+};
 
 export const getRouteProps = ({
   intercept, props, component, render, statusCode, routes, ...cleanProps
@@ -31,11 +36,21 @@ export const renderRouteStatus = ({ statusCode, children, ...props }) => {
 // rendered between Router/Switch/Route|Redirect components. This workaround solves that problem.
 export const renderRedirect = (props) => {
   const { statusCode, ...route } = props;
+  const { from, to, push, ...routeProps } = route;
+  const matchableRoute = getMatchableRoute(route);
 
-  const redirect = <Redirect {...getMatchableRoute(route)} />;
+  const redirect = isAbsoluteUrl(to)
+    ? (
+      <Route
+        {...matchableRoute}
+        path={from}
+        component={({ url = to }) => <AbsoluteRedirect to={url} />}
+      />
+    )
+    : <Redirect {...matchableRoute} />;
+
   if (!statusCode) return redirect;
 
-  const { from, to, push, ...routeProps } = route;
   const children = <Switch>{redirect}</Switch>;
 
   // We wrap the Redirect in Switch to reset React Router's path logic.
